@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-18.18
+resolver: nightly-2022-01-27 #lts-18.18
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,8 +39,11 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
 
+extra-deps:
+  #Unreleased version of xml-lens, fixed for GHC 9+
+  - git: https://github.com/fumieval/xml-lens.git
+    commit: 4612e5ea18822baef678d7176c1ab5f93e4e31e9
 # Override default flag values for local packages and extra-deps
 # flags: {}
 

@@ -21,18 +21,22 @@ description: Please see the README on GitHub at <https://github.com/githubuser/v
 
 dependencies:
   - base >= 4.7 && < 5
+  - servant >= 0.18.3
   - lens
   - xml-conduit
   - xml-lens
   - text
   - bytestring
-  - servant
   - http-media
   - openapi3
   - containers
   - first-class-families
   - case-insensitive
   - modern-uri
+
+when:
+  - condition: impl(ghc >= 9.0.0)
+    default-extensions: ImpredicativeTypes
 
 library:
   source-dirs: src

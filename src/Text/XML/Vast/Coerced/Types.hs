@@ -4,11 +4,11 @@
 module Text.XML.Vast.Coerced.Types where
 
 import           Data.OpenApi
-import qualified Network.HTTP.Media           as M
-import           Servant.API                  (Accept (contentType),
-                                               MimeRender (mimeRender),
-                                               MimeUnrender (mimeUnrender))
-import           Text.XML                     (Document, Element)
+import qualified Network.HTTP.Media            as M
+import           Servant.API.ContentTypes
+import           Text.XML                       ( Document
+                                                , Element
+                                                )
 import           Text.XML.Vast.Coerced.Parse
 import           Text.XML.Vast.Coerced.Render
 
@@ -27,11 +27,10 @@ instance MimeRender XML VastDocument where
 instance MimeUnrender XML VastDocument where
   mimeUnrender _ bs = case parseVastLbs bs of
     Right doc -> Right doc
-    Left err  -> Left $ show err
+    Left  err -> Left $ show err
 
 instance ToSchema VastDocument where
-  declareNamedSchema _ =
-    pure (NamedSchema (Just "VAST") binarySchema)
+  declareNamedSchema _ = pure (NamedSchema (Just "VAST") binarySchema)
 
 -- ** Types for VAST elements
 
@@ -62,7 +61,8 @@ data WrapperTrackers = WrapperTrackers
   , wtExtensions    :: [Extension]
   , wtTrackings     :: [Tracking]
   , wtClickTracking :: [ClickTracking]
-  } deriving (Show, Eq)
+  }
+  deriving (Show, Eq)
 
 newtype Error = Error
   { unError :: Element

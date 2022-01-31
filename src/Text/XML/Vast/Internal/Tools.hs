@@ -9,15 +9,17 @@
 
 module Text.XML.Vast.Internal.Tools where
 
-import           Control.Lens                hiding ((:>))
+import           Control.Lens            hiding ( (:>) )
 import           Data.Coerce
 import           Data.List
-import           Data.List.NonEmpty          (NonEmpty)
-import qualified Data.List.NonEmpty          as NonEmpty
-import           Data.Map.Strict             (Map)
+import           Data.List.NonEmpty             ( NonEmpty )
+import qualified Data.List.NonEmpty            as NonEmpty
+import           Data.Map.Strict                ( Map )
 import           Data.Monoid
 import           Data.String
-import           Data.Text                   (Text, pack)
+import           Data.Text                      ( Text
+                                                , pack
+                                                )
 import           Data.Tree
 import           GHC.TypeLits
 import           Text.URI
@@ -56,30 +58,31 @@ create
   -> s
   -> s
 create l es d
-  | view (l . name) d /= rootName = d & l .~ reconstruct (rootName:path)
+  | view (l . name) d /= rootName = d & l .~ reconstruct (rootName : path)
   | otherwise                     = d & l .~ findHole path (view l d)
-  where
-    rootName : path = fmap fromString $ NonEmpty.toList $ term @path
+ where
+  rootName : path = fmap fromString $ NonEmpty.toList $ term @path
 
-    findHole []     e = e & nodes %~ (<> fmap (_Element #) es)
-    findHole (p:ps) e = case e ^. nodes of
-      [] -> e & nodes .~ [_Element # reconstruct (p:ps)]
-      ns -> if any (nameIs p) ns
-        then e & nodes %~ fmap aim
-        else e & nodes %~ insertList compare [_Element # reconstruct (p:ps)]
-      where
-        aim :: Node -> Node
-        aim (NodeElement e')
-          | e' ^. name == p = NodeElement $ findHole ps e'
-          | otherwise       = NodeElement e'
-        aim someNode = someNode
+  findHole []       e = e & nodes %~ (<> fmap (_Element #) es)
+  findHole (p : ps) e = case e ^. nodes of
+    [] -> e & nodes .~ [_Element # reconstruct (p : ps)]
+    ns -> if any (nameIs p) ns
+      then e & nodes %~ fmap aim
+      else e & nodes %~ insertList compare [_Element # reconstruct (p : ps)]
+   where
+    aim :: Node -> Node
+    aim (NodeElement e') | e' ^. name == p = NodeElement $ findHole ps e'
+                         | otherwise       = NodeElement e'
+    aim someNode = someNode
 
-    nameIs p = (Just p ==) . preview (_Element . name)
+  nameIs p = (Just p ==) . preview (_Element . name)
 
-    -- First parameter can't be empty
-    reconstruct names
-      | length names == 1 = makeElement (head names) mempty ((_Element #) <$> es)
-      | otherwise         = makeElement (head names) mempty [_Element # reconstruct (tail names)]
+  -- First parameter can't be empty
+  reconstruct names
+    | length names == 1 = makeElement (head names) mempty ((_Element #) <$> es)
+    | otherwise = makeElement (head names)
+                              mempty
+                              [_Element # reconstruct (tail names)]
 
 add
   :: forall (path :: NonEmpty Symbol) (s :: Type)
@@ -97,7 +100,8 @@ addOrd
   -> [Element]
   -> s
   -> s
-addOrd l (fmap (_Element #) -> ns) = modify @path l (over nodes (insertList compareByName ns))
+addOrd l (fmap (_Element #) -> ns) =
+  modify @path l (over nodes (insertList compareByName ns))
 
 takeAll
   :: forall (path :: NonEmpty Symbol) (s :: Type)
@@ -156,7 +160,8 @@ takeUrlsIf
   -> (Element -> Bool)
   -> s
   -> [Either SomeException URI]
-takeUrlsIf l p = fmap mkURI . toListOf (l . foldPath' (term @path) . filtered p . text)
+takeUrlsIf l p =
+  fmap mkURI . toListOf (l . foldPath' (term @path) . filtered p . text)
 
 takeUrlIf
   :: forall (path :: NonEmpty Symbol) (s :: Type)
@@ -174,9 +179,9 @@ drop'
   -> s
   -> s
 drop' l = dropIf @(NonEmptyInit path) l p
-  where
-    elemName = fromString . NonEmpty.last $ term @path
-    p e = elemName == view name e
+ where
+  elemName = fromString . NonEmpty.last $ term @path
+  p e = elemName == view name e
 
 dropIf
   :: forall (path :: NonEmpty Symbol) (s :: Type)
@@ -186,9 +191,9 @@ dropIf
   -> s
   -> s
 dropIf l p = modify @path l (over nodes (filter deleteNodes))
-  where
-    deleteNodes (NodeElement e) = not $ p e
-    deleteNodes _               = True
+ where
+  deleteNodes (NodeElement e) = not $ p e
+  deleteNodes _               = True
 
 merge
   :: forall (path :: NonEmpty Symbol) (s :: Type)
@@ -263,17 +268,11 @@ dAddOrd
 dAddOrd = addOrd @path root
 
 dTakeAll
-  :: forall (path :: NonEmpty Symbol)
-   . Term path
-  => Document
-  -> [Element]
+  :: forall (path :: NonEmpty Symbol) . Term path => Document -> [Element]
 dTakeAll = takeAll @path root
 
 dTakeFirst
-  :: forall (path :: NonEmpty Symbol)
-   . Term path
-  => Document
-  -> Maybe Element
+  :: forall (path :: NonEmpty Symbol) . Term path => Document -> Maybe Element
 dTakeFirst = takeFirst @path root
 
 dTakeAllIf
@@ -388,17 +387,11 @@ eAddOrd
 eAddOrd = addOrd @path id
 
 eTakeAll
-  :: forall (path :: NonEmpty Symbol)
-   . Term path
-  => Element
-  -> [Element]
+  :: forall (path :: NonEmpty Symbol) . Term path => Element -> [Element]
 eTakeAll = takeAll @path id
 
 eTakeFirst
-  :: forall (path :: NonEmpty Symbol)
-   . Term path
-  => Element
-  -> Maybe Element
+  :: forall (path :: NonEmpty Symbol) . Term path => Element -> Maybe Element
 eTakeFirst = takeFirst @path id
 
 eTakeAllIf
@@ -488,23 +481,23 @@ foldPath p = root . foldPath' p
 -- | Turn a list of path segments into
 -- a 'Traversal' of 'Element's in 'Element'.
 foldPath' :: NonEmpty String -> Traversal' Element Element
-foldPath' = foldr1 (...) . fmap (named . mk . pack)
+foldPath' neStr = foldr1 (...) elementTraversals
+  where elementTraversals = traversalToLensLike . named . mk . pack <$> neStr
 
-makeElement
-  :: Name
-  -> Map Name Text
-  -> [Node]
-  -> Element
-makeElement n as ns = Element
-  { elementName = n
-  , elementAttributes = as
-  , elementNodes = ns
-  }
+-- | Due to GHC 9+ simplified subsumption we need to manually convert some lens. 
+-- This is id function basically.
+traversalToLensLike
+  :: forall f s t a b
+   . (Applicative f)
+  => Traversal s t a b
+  -> LensLike f s t a b
+traversalToLensLike f = f
 
-compareByName
-  :: Node
-  -> Node
-  -> Ordering
+makeElement :: Name -> Map Name Text -> [Node] -> Element
+makeElement n as ns =
+  Element { elementName = n, elementAttributes = as, elementNodes = ns }
+
+compareByName :: Node -> Node -> Ordering
 compareByName n1 n2 = coerce @_ @Node' n1 `compare` coerce @_ @Node' n2
 
 newtype Node' = Node'
@@ -512,8 +505,9 @@ newtype Node' = Node'
   deriving (Eq, Show)
 
 instance Ord Node' where
-  compare (Node' (NodeElement e1)) (Node' (NodeElement e2)) = (compare `on` view localName) e1 e2
-  compare (Node' n1)               (Node' n2)               = compare n1 n2
+  compare (Node' (NodeElement e1)) (Node' (NodeElement e2)) =
+    (compare `on` view localName) e1 e2
+  compare (Node' n1) (Node' n2) = compare n1 n2
 
 insertList
   :: Ord a
@@ -523,10 +517,5 @@ insertList
   -> [a] -- ^ Both of them merged preserving ordering
 insertList cmp = foldFs (insertBy cmp)
 
-foldFs
-  :: Foldable t
-  => (a -> b -> b)
-  -> t a
-  -> b
-  -> b
+foldFs :: Foldable t => (a -> b -> b) -> t a -> b -> b
 foldFs f = appEndo . foldMap (Endo . f)
