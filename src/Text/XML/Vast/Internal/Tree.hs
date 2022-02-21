@@ -52,6 +52,8 @@ type VastTree =
               ]
             , "NonLinear" :>
               [ Leaf "StaticResource"
+              , Leaf "IFrameResource"
+              , Leaf "HTMLResource"
               ]
             , Leaf "CompanionAds"
             ]
