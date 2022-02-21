@@ -50,10 +50,13 @@ type VastTree =
                 , Leaf "IconViewTracking"
                 ]
               ]
-            , "NonLinear" :>
-              [ Leaf "StaticResource"
-              , Leaf "IFrameResource"
-              , Leaf "HTMLResource"
+            , "NonLinearAds" :>
+              [ Singleton "TrackingEvents" "Tracking"
+              , "NonLinear" :>
+                [ Leaf "StaticResource"
+                , Leaf "IFrameResource"
+                , Leaf "HTMLResource"
+                ]
               ]
             , Leaf "CompanionAds"
             ]
