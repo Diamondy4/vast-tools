@@ -1,15 +1,15 @@
-{-# LANGUAGE DataKinds            #-}
-{-# LANGUAGE PolyKinds            #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE TypeOperators        #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Text.XML.Vast.Internal.Tree where
 
-import           Data.Tree
-import           Fcf                hiding (Any, type (&&), type (||))
-import           Fcf.Class.Foldable
-import           Fcf.Class.Monoid
+import Data.Tree
+import Fcf hiding (Any, type (&&), type (||))
+import Fcf.Class.Foldable
+import Fcf.Class.Monoid
 
 -- * Type-Level Tree definition and tools
 
@@ -108,22 +108,26 @@ type family Subtrees (t :: Tree a) :: [Tree a] where
 -- ** Traverse Tree
 
 -- | Map implementation for Tree
-type instance Eval (Map f ('Node a ts))
-  = 'Node (Eval (f a)) (Eval (Map (Map f) ts))
+type instance
+  Eval (Map f ( 'Node a ts)) =
+    'Node (Eval (f a)) (Eval (Map (Map f) ts))
 
 -- | FoldMap implementation for Tree
-type instance Eval (FoldMap f (a :> ts))
-  = Eval (f a) <> Eval (FoldMap (FoldMap f) ts)
+type instance
+  Eval (FoldMap f (a :> ts)) =
+    Eval (f a) <> Eval (FoldMap (FoldMap f) ts)
 
 -- | Flatten a tree
 type Flatten t = Eval (FlattenImpl t)
 
 -- | 'Flatten' implementation
 data FlattenImpl :: Tree a -> Exp [a]
-type instance Eval (FlattenImpl t) =
-  Eval (FlattenHelper t '[])
+
+type instance
+  Eval (FlattenImpl t) =
+    Eval (FlattenHelper t '[])
 
 data FlattenHelper :: Tree a -> [a] -> Exp [a]
-type instance Eval (FlattenHelper (x :> ts) xs) =
-  x ': Eval (Foldr FlattenHelper xs ts)
-
+type instance
+  Eval (FlattenHelper (x :> ts) xs) =
+    x ': Eval (Foldr FlattenHelper xs ts)

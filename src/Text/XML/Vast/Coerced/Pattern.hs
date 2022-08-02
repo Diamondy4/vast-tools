@@ -1,26 +1,26 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PatternSynonyms   #-}
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Text.XML.Vast.Coerced.Pattern where
 
-import           Control.Lens
-import           Data.Coerce
-import           Text.XML.Lens
-import           Text.XML.Vast.Coerced.Types
-import           Text.XML.Vast.Internal.Path
-import           Text.XML.Vast.Internal.Term
-import           Text.XML.Vast.Internal.Tools (foldPath)
+import Control.Lens
+import Data.Coerce
+import Text.XML.Vast.Coerced.Types
+import Text.XML.Vast.Internal.Other
+import Text.XML.Vast.Internal.Path
+import Text.XML.Vast.Internal.Term
+import Text.XML.Vast.Internal.Tools (foldPath)
 
 -- ** Patterns
 
 -- *** Wrapper
 
 isWrapper :: Coercible d Document => d -> Bool
-isWrapper (coerce -> d) =  has (foldPath (term @(PathTo "Wrapper"))) d
+isWrapper (coerce -> d) = has (foldPath (term @(PathTo "Wrapper"))) d
 
 pattern IsWrapper :: VastDocument
 pattern IsWrapper <- (isWrapper -> True)
@@ -47,9 +47,12 @@ pattern IsNobanner <- (isNobanner -> True)
 -- *** VPAID
 
 isVpaid :: Coercible d Document => d -> Bool
-isVpaid (coerce -> d) = has ( foldPath (term @(PathTo "MediaFile"))
-                            . attributeIs "apiFramework" "VPAID"
-                            ) d
+isVpaid (coerce -> d) =
+  has
+    ( foldPath (term @(PathTo "MediaFile"))
+        . attributeIs "apiFramework" "VPAID"
+    )
+    d
 
 pattern IsVpaid :: VastDocument
 pattern IsVpaid <- (isVpaid -> True)
