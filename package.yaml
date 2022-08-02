@@ -24,7 +24,6 @@ dependencies:
   - servant >= 0.18.3
   - lens
   - xml-conduit
-  - xml-lens
   - text
   - bytestring
   - http-media

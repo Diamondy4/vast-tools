@@ -2,12 +2,12 @@
 
 module Text.XML.Vast.Coerced.Parse where
 
-import           Control.Exception
-import qualified Data.ByteString.Lazy         as LBS
-import           Data.Coerce
-import qualified Data.Text.Lazy               as LT
-import           Text.XML
-import           Text.XML.Vast.Internal.Parse as Internal
+import Control.Exception
+import qualified Data.ByteString.Lazy as LBS
+import Data.Coerce
+import qualified Data.Text.Lazy as LT
+import Text.XML
+import Text.XML.Vast.Internal.Parse as Internal
 
 -- ** Parsing
 

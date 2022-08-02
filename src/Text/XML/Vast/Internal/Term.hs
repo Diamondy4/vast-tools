@@ -1,19 +1,19 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE PolyKinds           #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE TypeFamilies        #-}
-{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Text.XML.Vast.Internal.Term where
 
-import           Data.List.NonEmpty
-import           Data.Proxy
-import           Data.Tree
-import           GHC.TypeLits
-import           Text.XML
+import Data.List.NonEmpty
+import Data.Proxy
+import Data.Tree
+import GHC.TypeLits
+import Text.XML
 
 type KindOf (a :: k) = k
 
@@ -50,19 +50,19 @@ instance Term ('[] :: [k]) where
 instance (Term a, Term as) => Term ((a ': as) :: [k]) where
   term = term @a : term @as
 
-instance Term ('Nothing :: Maybe k) where
+instance Term ( 'Nothing :: Maybe k) where
   term = Nothing
 
-instance (Term a) => Term (('Just a) :: Maybe k) where
+instance (Term a) => Term (( 'Just a) :: Maybe k) where
   term = Just (term @a)
 
-instance (Term a) => Term (('Left a) :: Either k1 k2) where
+instance (Term a) => Term (( 'Left a) :: Either k1 k2) where
   term = Left (term @a)
 
-instance (Term a) => Term (('Right a) :: Either k1 k2) where
+instance (Term a) => Term (( 'Right a) :: Either k1 k2) where
   term = Right (term @a)
 
-instance (Term a, Term as) => Term ('Node a as) where
+instance (Term a, Term as) => Term ( 'Node a as) where
   term = Node (term @a) (term @as)
 
 instance (Term a, Term as) => Term (a ':| as) where
