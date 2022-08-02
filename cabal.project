@@ -1,8 +1,0 @@
-packages:
-  .
-
--- Unreleased version of xml-lens, fixed for GHC 9+ 
-source-repository-package
-  type: git
-  location: https://github.com/fumieval/xml-lens.git
-  tag: 4612e5ea18822baef678d7176c1ab5f93e4e31e9
