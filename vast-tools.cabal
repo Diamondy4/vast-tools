@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.5.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -34,6 +34,8 @@ library
       Text.XML.Vast.Coerced.Render
       Text.XML.Vast.Coerced.Tools
       Text.XML.Vast.Coerced.Types
+      Text.XML.Vast.Internal.Lens
+      Text.XML.Vast.Internal.Other
       Text.XML.Vast.Internal.Parse
       Text.XML.Vast.Internal.Path
       Text.XML.Vast.Internal.Render
@@ -58,11 +60,10 @@ library
     , servant >=0.18.3
     , text
     , xml-conduit
-    , xml-lens
+  default-language: Haskell2010
   if impl(ghc >= 9.0.0)
     default-extensions:
         ImpredicativeTypes
-  default-language: Haskell2010
 
 test-suite vast-tools-test
   type: exitcode-stdio-1.0
@@ -86,8 +87,7 @@ test-suite vast-tools-test
     , text
     , vast-tools
     , xml-conduit
-    , xml-lens
+  default-language: Haskell2010
   if impl(ghc >= 9.0.0)
     default-extensions:
         ImpredicativeTypes
-  default-language: Haskell2010

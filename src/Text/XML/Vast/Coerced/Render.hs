@@ -2,10 +2,10 @@
 
 module Text.XML.Vast.Coerced.Render where
 
-import qualified Data.ByteString.Lazy          as LBS
-import           Data.Coerce
-import qualified Data.Text.Lazy                as LT
-import           Text.XML
+import qualified Data.ByteString.Lazy as LBS
+import Data.Coerce
+import qualified Data.Text.Lazy as LT
+import Text.XML
 import qualified Text.XML.Vast.Internal.Render as Internal
 
 -- ** Rendering
